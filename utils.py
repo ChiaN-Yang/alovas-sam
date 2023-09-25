@@ -1,5 +1,5 @@
-import cv2
 import os
+import cv2
 import pyvips
 import numpy as np
 from typing import Any, Dict, List
@@ -7,7 +7,21 @@ from typing import Any, Dict, List
 MIN_AREA = 5000
 
 
+def get_points(points: List, level: int):
+    """Get points prompt from commandline.
+    
+    Example:
+        [123 456 789 112] -> [[123, 456], [789, 112]]
+    """
+    input_point = np.array(points)
+    num_point = len(input_point)//2
+    input_point = np.array(np.split(input_point, num_point))//(4**level)
+    input_label = np.array([1]*num_point)
+    return input_point, input_label
+
+
 def load_image(image_path: str, level: int):
+    """Load image by using pyvips"""
     image = pyvips.Image.new_from_file(image_path, level=level)
     image = image.colourspace("srgb")
     image = image.numpy()
@@ -55,7 +69,7 @@ def generate_json(binary_masks):
         image_path: Path to the image file (optional).
 
     Returns:
-        A dictionary representing the LabelMe JSON file.
+        A dictionary representing the JSON file.
     """
     json_dict = {
         "annotation": list(),

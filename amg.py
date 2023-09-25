@@ -5,7 +5,7 @@ import json
 import os
 import numpy as np
 
-from utils import load_image, write_masks_to_folder, generate_json
+from utils import load_image, write_masks_to_folder, generate_json, get_points
 
 
 parser = argparse.ArgumentParser(
@@ -94,10 +94,7 @@ def main(args: argparse.Namespace) -> None:
     for t in targets:
         print(f"Processing '{t}'...")
         image = load_image(t, level=args.level)
-        input_point = np.array(args.points)
-        num_point = len(input_point)//2
-        input_point = np.array(np.split(input_point, num_point))//(4**args.level)
-        input_label = np.array([1]*num_point)
+        input_point, input_label = get_points(args.points, args.level)
         mask_predictor.set_image(image)
         masks, scores, logits = mask_predictor.predict(
             point_coords=input_point,
